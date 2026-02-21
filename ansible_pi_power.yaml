@@ -1,0 +1,66 @@
+---
+### Solve the power issue of Pi, where it randomly crashes and mount as read-only
+- name: Stabilize Hardware, Enable System Logs and Utilize Watchdog
+  hosts: rasp
+  become: yes
+  vars:
+    ssd_adapter_id: "13fd:5912"
+  tasks:
+
+      ## Enable journald with persistent storage
+    - name: Enable journald folder
+      file:
+        path: /var/log/journal
+        state: directory
+        owner: root
+        group: systemd-journal
+        mode: '2755' 
+
+    - name: Set journald storage to persistent
+      lineinfile:
+        path: /etc/systemd/journald.conf
+        regexp: '^#?Storage='
+        line: Storage=persistent
+        state: present 
+    
+      ## Uses older but more stable USB driver to prevent issues with SATA USB
+    - name: Use older but stable USB drivel, add USB quirk to cmdline.txt
+      lineinfile:
+        path: /boot/firmware/cmdline.txt
+        backrefs: yes
+        regexp: '^(?!.*usb-storage\.quirks={{ ssd_adapter_id }}:u)(.*)$'
+        line: 'usb-storage.quirks={{ ssd_adapter_id }}:u \1'
+
+      ## Install  and configure watchdog to reboot if anything goes wrong in the system
+    - name: Install watchdog
+      apt:
+        name: watchdog
+        state: present
+      
+    - name: Enable hardware watchdog in firmware
+      lineinfile:
+        path: /boot/firmware/config.txt
+        regexp: '^#?dtparam=watchdog='
+        line: 'dtparam=watchdog=on'
+        insertbefore: '^\[all\]'
+        state: present
+
+
+    - name: Set watchdog timeout and priority
+      lineinfile:
+        path: /etc/watchdog.conf
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      loop:
+        - { regexp: '^#?watchdog-timeout', line: 'watchdog-timeout = 15' }
+        - { regexp: '^#?realtime', line: 'realtime = yes' }
+        - { regexp: '^#?priority', line: 'priority = 1' }
+
+    - name: Ensure watchdog service is running and enabled
+      systemd:
+        name: watchdog
+        state: started
+        enabled: yes
+
+        
+            

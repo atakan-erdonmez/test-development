@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: alta3-pv
+spec:
+  storageClassName: manual # type
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce # only 1 node can add as RW
+  hostPath: 
+    path: "/mnt/data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nginx-pvc
+spec:
+  storageClassName: manual
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

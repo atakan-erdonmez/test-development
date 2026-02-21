@@ -1,0 +1,10 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: denyall
+  namespace: default
+spec:
+  podSelector: {} # select every pod
+  policyTypes:
+  - Ingress
+  - Egress
