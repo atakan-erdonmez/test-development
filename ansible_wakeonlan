@@ -1,0 +1,25 @@
+---
+- name: Enable Wake-on-LAN on OptiPlex Proxmox Nodes
+  hosts: optiplex
+  become: yes
+  vars:
+    target_interface: "enp2s0"
+
+  tasks:
+    - name: Install ethtool
+      apt:
+        name: ethtool
+        state: present
+        update_cache: yes
+
+    - name: Add post-up WoL command to network interfaces
+      lineinfile:
+        path: /etc/network/interfaces
+        insertafter: "^iface {{ target_interface }} inet manual"
+        line: "        post-up /usr/sbin/ethtool -s {{ target_interface }} wol g"
+        state: present
+      register: network_config
+
+    - name: Apply network changes (if modified)
+      shell: ifreload -a
+      if: network_config.changed
