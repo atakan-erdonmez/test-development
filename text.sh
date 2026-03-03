@@ -25,10 +25,10 @@ if [ "$EVENT" = "ONBATT" ]; then
     echo "Grace period expired. Shutting down remote infrastructure..." | wall
     
     # Remote Shutdowns (Using SSH keys)
-    ssh -o ConnectTimeout=5 root@192.168.1.50 "poweroff"  # Example: Proxmox
-    ssh -o ConnectTimeout=5 admin@192.168.1.60 "/sbin/poweroff" # Example: QNAP
+    #ssh -o ConnectTimeout=5 root@192.168.1.50 "poweroff"  # Example: Proxmox
+    ssh -o ConnectTimeout=5 admin@192.168.10.103 "uptime" # Example: QNAP
     
     # 6. Final Shutdown of the Raspberry Pi itself
     echo "Remote servers signaled. Shutting down the NUT Master now." | wall
-    shutdown -h now
+    #shutdown -h now
 fi

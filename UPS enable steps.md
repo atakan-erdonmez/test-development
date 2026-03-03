@@ -36,6 +36,8 @@ if [ "$EVENT" = "ONBATT" ]; then
     # Finally, shut down this Pi
     shutdown -h now
 fi
+
+
 2. Link NUT to your Script
 Edit /etc/nut/upsmon.conf:
 
@@ -47,3 +49,14 @@ Find the NOTIFYFLAG section and add:
 NOTIFYFLAG ONBATT EXEC
 
 The EXEC flag is what tells NUT to actually run your script when the "On Battery" event occurs.
+
+3. create the log file
+4. make sure the .sh has correct permissions
+
+5. ssh keyscans so it won't ask known host
+
+ssh-keyscan -H 192.168.10.101 >> /var/lib/nut/.ssh/known_hosts
+ssh-keyscan -H 192.168.10.102 >> /var/lib/nut/.ssh/known_hosts
+ssh-keyscan -H 192.168.10.103 >> /var/lib/nut/.ssh/known_hosts
+chown nut:nut /var/lib/nut/.ssh/known_hosts
+chmod 644 /var/lib/nut/.ssh/known_hosts
