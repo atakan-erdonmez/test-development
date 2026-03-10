@@ -1,4 +1,4 @@
-#!/bin/bash
+z#!/bin/bash
 
 # 1. Capture the event type sent by NUT (e.g., ONBATT (OB), ONLINE)
 EVENT=$1
