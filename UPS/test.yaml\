@@ -1,0 +1,16 @@
+    - name: Configure NFS mount in fstab and mount it
+      mount:
+        path: "{{ mount_point }}"
+        src: "{{ nfs_server }}:{{ nfs_path }}"
+        fstype: nfs
+        opts: "nfsvers=4.0,defaults,_netdev,noatime,timeo=600,retrans=5,x-systemd.automount,x-systemd.idle-timeout=600"
+        state: mounted
+
+
+    - name: Install NFS client dependencies
+      apt:
+        name:
+          - nfs-common
+          - rpcbind
+        state: present
+        update_cache: yes
